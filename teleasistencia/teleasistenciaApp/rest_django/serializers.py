@@ -24,6 +24,11 @@ class PermissionSerializer(serializers.ModelSerializer):
         model = Permission
         fields = '__all__'
 
+class DatabaseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Database
+        fields = '__all__'
+
 class GroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = Group
@@ -39,6 +44,15 @@ class Tipo_Recurso_Comunitario_Serializer(serializers.ModelSerializer):
     class Meta:
         model = Tipo_Recurso_Comunitario
         fields = '__all__' #Indica todos los campos
+    def create(self, validated_data):
+        database_user =Database_User.objects.get(user=self.context["request"].user)
+        return self.Meta.model.objects.db_manager(database_user.database.nameDescritive).create(**validated_data)
+    '''
+    def update(self, instance, validated_data):
+        database_user =Database_User.objects.get(user=self.context["request"].user)
+        cambios =Tipo_Recurso_Comunitario.objects.db_manager(database_user.database.nameDescritive).filter(id=instance.id).update(**validated_data)
+        return cambios
+    '''
 
 
 class Recurso_Comunitario_Serializer(serializers.ModelSerializer):
@@ -104,18 +118,11 @@ class Relacion_Terminal_Recurso_Comunitario_Serializer(serializers.ModelSerializ
 
 
 class Terminal_Serializer(serializers.ModelSerializer):
+
     class Meta:
         model = Terminal
         fields = '__all__'
         depth = 2
-
-
-class Historico_Tipo_Situación_Serializer(serializers.ModelSerializer):
-    class Meta:
-        model = Historico_Tipo_Situacion
-        fields = '__all__'
-        depth = 1
-
 
 class Tipo_Situacion_Serializer(serializers.ModelSerializer):
     class Meta:
@@ -187,26 +194,13 @@ class Tecnologia_Serializer(serializers.ModelSerializer):
     class Meta:
         model = Tecnologia
         fields = '__all__' #Indica todos los campos
-        depth = 2
 
 class Desarrollador_Tecnologia_Serializer(serializers.ModelSerializer):
 
-    # Devuelve también los datos de los datos de las tecnologias del Desarrollador_tecnologia
-    tecnologias = Tecnologia_Serializer(
-        many=True,
-        read_only=True)
-
     class Meta:
         model = Desarrollador_Tecnologia
-        fields = '__all__' #Indica todos los campos
+        fields = ['id_tecnologia'] #Indica todos los campos
         depth = 1
-
-class Gestion_Base_Datos_Serializer(serializers.ModelSerializer):
-    class Meta:
-        model = Gestion_Base_Datos
-        fields = '__all__'
-        depth = 1
-
 
 class Desarrollador_Serializer(serializers.ModelSerializer):
 
@@ -217,8 +211,8 @@ class Desarrollador_Serializer(serializers.ModelSerializer):
 
     class Meta:
         model = Desarrollador
-        fields = '__all__' #Indica todos los campos
-        depth = 1
+        fields = ['desarrollador_tecnologias','es_profesor','descripcion','imagen','nombre'] #Indica todos los campos
+
 
 class Convocatoria_Proyecto_Serializer(serializers.ModelSerializer):
 
@@ -230,4 +224,10 @@ class Convocatoria_Proyecto_Serializer(serializers.ModelSerializer):
     class Meta:
         model = Convocatoria_Proyecto
         fields = '__all__' #Indica todos los campos
+
+
+class Gestion_Base_Datos_Serializer(serializers.ModelSerializer):
+    class Meta:
+        model = Gestion_Base_Datos
+        fields = '__all__'
         depth = 1
