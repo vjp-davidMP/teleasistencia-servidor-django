@@ -1697,7 +1697,7 @@ class SeguimientoTeleoperador(viewsets.ModelViewSet):
         usuario_json["id"] = user_search.id
         usuario_json["first_name"] = user_search.first_name
         usuario_json["second_name"] = user_search.last_name
-        usuario_json["_total"] = alarmas.count()
+        usuario_json["alarmas_total"] = alarmas.count()
         usuario_json["agendas_total"] = historico_agenda_llamadas.count()
         # Serializamos as agendas/alarmas y convertimos su salida a JSON
         usuario_json["agendas"] = json.loads(json.dumps(Historico_Agenda_Llamadas_Serializer(historico_agenda_llamadas, many=True).data))
